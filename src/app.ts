@@ -10,7 +10,7 @@ app.use(cors());
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello typescript mongoose server !');
 });
-app.post('/create-student',UserRoutes);
+app.post('/create-student', UserRoutes);
 app.use('/api/v1', router);
 app.use(globalErrorHandler);
 app.use(notFound);

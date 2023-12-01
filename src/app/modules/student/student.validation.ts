@@ -27,13 +27,13 @@ const localGuardianValidationSchema = z.object({
   address: z.string(),
 });
 
- const studentValidationSchema = z.object({
+const studentValidationSchema = z.object({
   body: z.object({
     password: z.string().max(20),
     student: z.object({
       name: userNameValidationSchema,
       gender: z.enum(['male', 'female', 'other']),
-      dateOfBirth: z.date().optional(),
+      dateOfBirth: z.string().optional(),
       email: z.string().email(),
       contactNo: z.string(),
       emergencyContactNo: z.string(),
@@ -48,6 +48,6 @@ const localGuardianValidationSchema = z.object({
   }),
 });
 
-export  const studentValidationS={
-  studentValidationSchema
+export const studentValidationS = {
+  studentValidationSchema,
 };
