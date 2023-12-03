@@ -12,60 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
+exports.AcademicDepartment = void 0;
 const mongoose_1 = require("mongoose");
-const config_1 = __importDefault(require("../../config"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
-const userSchema = new mongoose_1.Schema({
-    id: {
+const academicDepartmentSchema = new mongoose_1.Schema({
+    name: {
         type: String,
         required: true,
+        unique: true,
     },
-    password: {
-        type: String,
-        required: true,
-    },
-    needsPasswordChange: {
-        type: Boolean,
-        default: true,
-    },
-    role: {
-        type: String,
-        enum: ['student', 'faculty', 'admin'],
-    },
-    status: {
-        type: String,
-        enum: ['in-progress', 'blocked'],
-        default: 'in-progress',
-    },
-    isDeleted: {
-        type: Boolean,
-        default: false,
+    academicFaculty: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'AcademicFaculty',
     },
 }, {
     timestamps: true,
 });
-userSchema.pre('save', function (next) {
+academicDepartmentSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        const user = this;
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
-        next();
-    });
-});
-userSchema.post('save', function (doc, next) {
-    doc.password = '';
-    next();
-});
-userSchema.pre('findOneAndUpdate', function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const query = this.getQuery();
-        const isstudentExist = yield exports.User.findOne(query);
-        if (!isstudentExist) {
-            throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'user not exist!');
+        const isDepartmentExist = yield exports.AcademicDepartment.findOne({
+            name: this.name,
+        });
+        if (isDepartmentExist) {
+            throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'This department is already exist!');
         }
         next();
     });
 });
-exports.User = (0, mongoose_1.model)('User', userSchema);
+academicDepartmentSchema.pre('findOneAndUpdate', function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = this.getQuery();
+        const isDepartmentExist = yield exports.AcademicDepartment.findOne(query);
+        if (!isDepartmentExist) {
+            throw new AppError_1.default(404, 'This department does not exist!');
+        }
+        next();
+    });
+});
+exports.AcademicDepartment = (0, mongoose_1.model)('AcademicDepartment', academicDepartmentSchema);

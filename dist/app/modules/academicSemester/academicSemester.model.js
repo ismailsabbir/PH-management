@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AcademicSemester = void 0;
 const mongoose_1 = require("mongoose");
 const academicSemester_constant_1 = require("./academicSemester.constant");
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const acdemicSemesterSchema = new mongoose_1.Schema({
     name: {
         type: String,
@@ -47,7 +51,7 @@ acdemicSemesterSchema.pre('save', function (next) {
             name: this.name,
         });
         if (isSemesterExists) {
-            throw new Error('Semester is already exists !');
+            throw new AppError_1.default(404, 'Semester is already exists !');
         }
         next();
     });
