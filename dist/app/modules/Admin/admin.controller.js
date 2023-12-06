@@ -12,55 +12,54 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.StudentControllers = void 0;
+exports.AdminControllers = void 0;
 const http_status_1 = __importDefault(require("http-status"));
-const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
-const student_service_1 = require("./student.service");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const getSingleStudent = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { studentId } = req.params;
-    const result = yield student_service_1.StudentServices.getSingleStudentFromDB(studentId);
+const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
+const admin_service_1 = require("./admin.service");
+const getSingleAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield admin_service_1.AdminServices.getSingleAdminFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Student is retrieved succesfully',
+        message: 'Admin is retrieved succesfully',
         data: result,
     });
 }));
-const getAllStudents = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.query);
-    const result = yield student_service_1.StudentServices.getAllStudentsFromDB(req.query);
+const getAllAdmins = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield admin_service_1.AdminServices.getAllAdminsFromDB(req.query);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Student are retrieved succesfully',
+        message: 'Admins are retrieved succesfully',
         data: result,
     });
 }));
-const deleteStudent = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { studentId } = req.params;
-    const result = yield student_service_1.StudentServices.deleteStudentFromDB(studentId);
+const updateAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { admin } = req.body;
+    const result = yield admin_service_1.AdminServices.updateAdminIntoDB(id, admin);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Student is deleted succesfully',
+        message: 'Admin is updated succesfully',
         data: result,
     });
 }));
-const updateStudent = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { studentId } = req.params;
-    const { student } = req.body;
-    const result = yield student_service_1.StudentServices.updateStudentIntoDB(studentId, student);
+const deleteAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield admin_service_1.AdminServices.deleteAdminFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Student is updated succesfully',
+        message: 'Admin is deleted succesfully',
         data: result,
     });
 }));
-exports.StudentControllers = {
-    getAllStudents,
-    getSingleStudent,
-    deleteStudent,
-    updateStudent,
+exports.AdminControllers = {
+    getAllAdmins,
+    getSingleAdmin,
+    deleteAdmin,
+    updateAdmin,
 };
