@@ -27,7 +27,8 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
   //set student role
   userData.role = 'student';
-
+  // set student email
+  userData.email = payload.email;
   // find academic semester info
   const admissionSemester = await AcademicSemester.findById(
     payload.admissionSemester,
@@ -76,9 +77,10 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   //if password is not given , use deafult password
   userData.password = password || (config.default_password as string);
 
-  //set student role
+  //set faculty role
   userData.role = 'faculty';
-
+  // set faculty email
+  userData.email = payload.email;
   // find academic department info
   const academicDepartment = await AcademicDepartment.findById(
     payload.academicDepartment,
@@ -131,9 +133,10 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
   //if password is not given , use deafult password
   userData.password = password || (config.default_password as string);
 
-  //set student role
+  //set admin role
   userData.role = 'admin';
-
+  // set Admin email
+  userData.email = payload.email;
   const session = await mongoose.startSession();
 
   try {
@@ -169,8 +172,31 @@ const createAdminIntoDB = async (password: string, payload: TFaculty) => {
     throw new Error(err);
   }
 };
+const getMe = async (userId: string, role: string) => {
+  let result = null;
+  if (role === 'student') {
+    result = await StudentModel.findOne({ id: userId }).populate('user');
+  }
+  if (role === 'admin') {
+    result = await Admin.findOne({ id: userId }).populate('user');
+  }
+
+  if (role === 'faculty') {
+    result = await Faculty.findOne({ id: userId }).populate('user');
+  }
+
+  return result;
+};
+const changeStatus = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  getMe,
+  changeStatus,
 };

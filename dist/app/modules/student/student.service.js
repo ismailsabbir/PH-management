@@ -95,8 +95,7 @@ const getAllStudentsFromDB = (query) => __awaiter(void 0, void 0, void 0, functi
     return result;
 });
 const getSingleStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield student_model_1.StudentModel.findOne({ id })
-        .populate('user')
+    const result = yield student_model_1.StudentModel.findById(id)
         .populate('admissionSemester')
         .populate({
         path: 'academicDepartment',
@@ -106,31 +105,19 @@ const getSingleStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, functio
     });
     return result;
 });
-const deleteStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const session = yield mongoose_1.default.startSession();
-    try {
-        session.startTransaction();
-        const deletedStudent = yield student_model_1.StudentModel.findOneAndUpdate({ id }, { isDeleted: true }, { new: true, session });
-        if (!deletedStudent) {
-            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to delete student');
-        }
-        const deletedUser = yield user_model_1.User.findOneAndUpdate({ id }, { isDeleted: true }, { new: true, session });
-        if (!deletedUser) {
-            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to delete user');
-        }
-        yield session.commitTransaction();
-        yield session.endSession();
-        return deletedStudent;
-    }
-    catch (err) {
-        yield session.abortTransaction();
-        yield session.endSession();
-        throw new Error('Failed to delete student');
-    }
-});
 const updateStudentIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, guardian, localGuardian } = payload, remainingStudentData = __rest(payload, ["name", "guardian", "localGuardian"]);
     const modifiedUpdatedData = Object.assign({}, remainingStudentData);
+    /*
+      guardain: {
+        fatherOccupation:"Teacher"
+      }
+  
+      guardian.fatherOccupation = Teacher
+  
+      name.firstName = 'Mezba'
+      name.lastName = 'Abedin'
+    */
     if (name && Object.keys(name).length) {
         for (const [key, value] of Object.entries(name)) {
             modifiedUpdatedData[`name.${key}`] = value;
@@ -146,15 +133,39 @@ const updateStudentIntoDB = (id, payload) => __awaiter(void 0, void 0, void 0, f
             modifiedUpdatedData[`localGuardian.${key}`] = value;
         }
     }
-    const result = yield student_model_1.StudentModel.findOneAndUpdate({ id }, modifiedUpdatedData, {
+    const result = yield student_model_1.StudentModel.findByIdAndUpdate(id, modifiedUpdatedData, {
         new: true,
         runValidators: true,
     });
     return result;
 });
+const deleteStudentFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const session = yield mongoose_1.default.startSession();
+    try {
+        session.startTransaction();
+        const deletedStudent = yield student_model_1.StudentModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true, session });
+        if (!deletedStudent) {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to delete student');
+        }
+        // get user _id from deletedStudent
+        const userId = deletedStudent.user;
+        const deletedUser = yield user_model_1.User.findByIdAndUpdate(userId, { isDeleted: true }, { new: true, session });
+        if (!deletedUser) {
+            throw new AppError_1.default(http_status_1.default.BAD_REQUEST, 'Failed to delete user');
+        }
+        yield session.commitTransaction();
+        yield session.endSession();
+        return deletedStudent;
+    }
+    catch (err) {
+        yield session.abortTransaction();
+        yield session.endSession();
+        throw new Error('Failed to delete student');
+    }
+});
 exports.StudentServices = {
     getAllStudentsFromDB,
     getSingleStudentFromDB,
-    deleteStudentFromDB,
     updateStudentIntoDB,
+    deleteStudentFromDB,
 };
