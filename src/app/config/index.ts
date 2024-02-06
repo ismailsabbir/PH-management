@@ -15,6 +15,6 @@ export default {
   cloudinary_cloud_name: process.env.cloudinary_cloud_name,
   cloudinary_api_key: process.env.cloudinary_api_key,
   cloudinary_api_secret: process.env.cloudinary_api_secret,
-
+  super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
   // JWT_ACCESS_SECRET
 };
