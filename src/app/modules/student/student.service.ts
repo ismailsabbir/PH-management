@@ -6,25 +6,22 @@ import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
 import { object } from 'zod';
 import QueryBuilder from '../../builder/QueryBuilder';
+import { studentSearchableFields } from './student.constant';
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  const studentSearchAbleField = ['email', 'name.firstName', 'presentAddress'];
   const studentQuery = new QueryBuilder(
     StudentModel.find()
+      .populate('user')
       .populate('admissionSemester')
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      }),
+      .populate('academicDepartment academicFaculty'),
     query,
   )
-    .search(studentSearchAbleField)
+    .search(studentSearchableFields)
     .filter()
     .sort()
     .paginate()
     .fields();
+
   const meta = await studentQuery.countTotal();
   const result = await studentQuery.modelQuery;
 

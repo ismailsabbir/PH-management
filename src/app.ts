@@ -8,9 +8,9 @@ import router from './app/routes';
 const app: Application = express();
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: ['http://localhost:5173'] }));
+app.use(cors({ origin: ['http://localhost:5173'],credentials:true }));
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello typescript mongoose server !');
+  res.send('Hello PH Managemant Server !');
 });
 app.post('/create-student', UserRoutes);
 app.use('/api/v1', router);
